@@ -1,46 +1,32 @@
-using System.Net.Http.Json;
 using Export_trace_module.Models;
+using System.Net.Http.Json;
 
 namespace Export_trace_module.Services.ExternalAPIs;
-
-public interface ICultivoAPIService
-{
-    Task<IEnumerable<Cultivo>> GetAllCultivosAsync();
-    Task<Cultivo?> GetCultivoByIdAsync(int id);
-    // Otros métodos según necesites
-}
 
 public class CultivoAPIService : ICultivoAPIService
 {
     private readonly HttpClient _httpClient;
-    private readonly ILogger<CultivoAPIService> _logger;
 
-    public CultivoAPIService(IHttpClientFactory httpClientFactory, 
-                           ILogger<CultivoAPIService> logger)
+    public CultivoAPIService(HttpClient httpClient)
     {
-        _httpClient = httpClientFactory.CreateClient("CultivoAPI");
-        _logger = logger;
+        _httpClient = httpClient;
+    }
+
+    public async Task<Cultivo> GetCultivoByIdAsync(int id)
+    {
+        return await _httpClient.GetFromJsonAsync<Cultivo>($"/api/cultivos/{id}") 
+               ?? throw new Exception("Cultivo no encontrado");
     }
 
     public async Task<IEnumerable<Cultivo>> GetAllCultivosAsync()
     {
-        try
-        {
-            var response = await _httpClient.GetAsync("api/cultivos");
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<IEnumerable<Cultivo>>() ?? [];
-        }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex, "Error al obtener cultivos de API externa");
-            throw; // O maneja el error como prefieras
-        }
+        return await _httpClient.GetFromJsonAsync<IEnumerable<Cultivo>>("/api/cultivos") 
+               ?? Enumerable.Empty<Cultivo>();
     }
 
-    public async Task<Cultivo?> GetCultivoByIdAsync(int id)
+    public async Task<IEnumerable<Cultivo>> BuscarCultivosAsync(string criterio)
     {
-        var response = await _httpClient.GetAsync($"api/cultivos/{id}");
-        if (!response.IsSuccessStatusCode) return null;
-        return await response.Content.ReadFromJsonAsync<Cultivo>();
+        return await _httpClient.GetFromJsonAsync<IEnumerable<Cultivo>>($"/api/cultivos/buscar?q={criterio}") 
+               ?? Enumerable.Empty<Cultivo>();
     }
 }

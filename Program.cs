@@ -1,25 +1,56 @@
-using Microsoft.OpenApi.Models;
-
+using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+using Export_trace_module.Data;
+using Export_trace_module.Services;
+using Export_trace_module.Services.ExternalAPIs; // Añade este namespace
+using Export_trace_module.Controllers.MinimalAPIs; // O el namespace correcto donde están tus endpoints
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+// Configuración de PostgreSQL
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQLConnection")));
+
+// Configuración de HttpClient para APIs externas
+var plagaApiUrl = builder.Configuration["ExternalAPIs:PlagaAPI:BaseUrl"] 
+    ?? throw new InvalidOperationException("PlagaAPI BaseUrl no configurada");
+var cultivoApiUrl = builder.Configuration["ExternalAPIs:CultivoAPI:BaseUrl"]
+    ?? throw new InvalidOperationException("CultivoAPI BaseUrl no configurada");
+
+builder.Services.AddHttpClient<IPlagaAPIService, PlagaAPIService>(client => 
 {
-     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Export Trace API", Description = "", Version = "v1" });
+    client.BaseAddress = new Uri(plagaApiUrl);
 });
+
+builder.Services.AddHttpClient<ICultivoAPIService, CultivoAPIService>(client =>
+{
+    client.BaseAddress = new Uri(cultivoApiUrl);
+});
+
+// Registrar servicios
+builder.Services.AddScoped<IConsultaAPIService, ConsultaAPIService>();
+builder.Services.AddScoped<IDatosExportacionService, DatosExportacionService>();
+builder.Services.AddScoped<IPlagaAPIService, PlagaAPIService>();
+builder.Services.AddScoped<ICultivoAPIService, CultivoAPIService>();
+
+// Configuración de Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Configurar el pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
-   app.UseSwagger();
-   app.UseSwaggerUI(c =>
-   {
-      c.SwaggerEndpoint("/swagger/v1/swagger.json", "Export Trace API V1");
-   });
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.MapGet("/", () => "Hello World!");
+app.UseHttpsRedirection();
+
+// Mapear endpoints
+app.MapConsultaAPIEndpoints();
+app.MapPlagasEndpoints();
+app.MapExportacionesEndpoints();
 
 app.Run();

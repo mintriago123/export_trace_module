@@ -1,4 +1,7 @@
-using Export_trace_module.Services.ExternalAPIs;
+using Export_trace_module.Services; // Usa el namespace correcto donde está tu interfaz
+using Export_trace_module.Models;  // Para la clase Cultivo
+
+namespace Export_trace_module.Controllers.MinimalAPIs;
 
 public static class CultivosEndpoints
 {
@@ -14,6 +17,9 @@ public static class CultivosEndpoints
             var cultivo = await service.GetCultivoByIdAsync(id);
             return cultivo is not null ? Results.Ok(cultivo) : Results.NotFound();
         });
+
+        group.MapGet("/buscar/{criterio}", async (string criterio, ICultivoAPIService service) =>
+            await service.BuscarCultivosAsync(criterio));
 
         // Cachear respuestas si es apropiado
         group.MapGet("/cached", async (ICultivoAPIService service) =>
