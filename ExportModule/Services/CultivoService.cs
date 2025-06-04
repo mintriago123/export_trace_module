@@ -86,7 +86,7 @@ namespace ExportModule.Services
 
             if (!string.IsNullOrEmpty(updateDto.Nombre))
                 cultivo.Nombre = updateDto.Nombre;
-            
+
             if (!string.IsNullOrEmpty(updateDto.Tipo))
                 cultivo.Tipo = updateDto.Tipo;
 
@@ -140,9 +140,9 @@ namespace ExportModule.Services
 
             if (cultivo == null) return false;
 
-            // LÃ³gica: No exportar si tiene plagas de nivel "Alto" o "CrÃ­tico"
+            // Lógica: No exportar si tiene plagas de nivel "Alto" o "Crítico"
             var tienePlagasGraves = cultivo.Plagas
-                .Any(p => p.Nivel.ToLower() == "alto" || p.Nivel.ToLower() == "crÃ­tico");
+                .Any(p => p.Nivel.ToLower() == "alto" || p.Nivel.ToLower() == "crítico");
 
             return !tienePlagasGraves;
         }
