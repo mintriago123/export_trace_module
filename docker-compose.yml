@@ -2,11 +2,11 @@ version: "3.9"
 services:
   db:
     image: postgres:16
-    container_name: postgres-export_trace_db
+    container_name: postgres-export_module_db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: tu_password
-      POSTGRES_DB: export_trace_db
+      POSTGRES_PASSWORD: hola12p12
+      POSTGRES_DB: AgriculturaDB
     ports:
       - "5432:5432"
     volumes:
