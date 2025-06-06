@@ -1,35 +1,22 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+ï»¿using System;
 
 namespace ExportModule.Models
 {
     public class DatosAExportar
     {
-        [Key]
         public int Id { get; set; }
-
-        [Required]
         public DateTime FechaExportacion { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        public string TipoDato { get; set; } = string.Empty; // 'cultivo', 'plaga', 'consultaAPI'
-
-        [Required]
-        [MaxLength(20)]
-        public string Formato { get; set; } = string.Empty; // 'csv', 'pdf', 'json'
-
-        [Column(TypeName = "text")]
+        public string? TipoDato { get; set; }
+        public string? Formato { get; set; }
         public string? Contenido { get; set; }
 
-        // Claves foráneas opcionales
         public int? CultivoId { get; set; }
-        public int? PlagaId { get; set; }
-        public int? ConsultaAPIId { get; set; }
+        public Cultivo? Cultivo { get; set; }
 
-        // Navegación
-        public virtual Cultivo? Cultivo { get; set; }
-        public virtual Plaga? Plaga { get; set; }
-        public virtual ConsultaAPI? ConsultaAPI { get; set; }
+        public int? PlagaId { get; set; }
+        public Plaga? Plaga { get; set; }
+
+        public int? ConsultaAPIId { get; set; }
+        public ConsultaAPI? ConsultaAPI { get; set; }
     }
 }

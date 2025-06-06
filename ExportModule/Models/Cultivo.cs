@@ -1,21 +1,14 @@
-using System.ComponentModel.DataAnnotations;
+ï»¿using System.Collections.Generic;
 
 namespace ExportModule.Models
 {
     public class Cultivo
     {
-        [Key]
         public int Id { get; set; }
+        public required string Nombre { get; set; }
+        public required string Tipo { get; set; }
 
-        [Required]
-        [MaxLength(100)]
-        public string Nombre { get; set; } = string.Empty;
-
-        [Required]
-        [MaxLength(50)]
-        public string Tipo { get; set; } = string.Empty;
-
-        // Navegación
-        public virtual ICollection<Plaga> Plagas { get; set; } = new List<Plaga>();
+        public ICollection<Plaga> Plagas { get; set; } = new List<Plaga>();
+        public ICollection<DatosAExportar> DatosAExportar { get; set; } = new List<DatosAExportar>();
     }
 }

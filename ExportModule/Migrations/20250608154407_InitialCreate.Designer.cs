@@ -3,6 +3,7 @@ using System;
 using ExportModule.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,10 +11,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ExportModule.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AppDbContext))]
+    [Migration("20250608154407_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,17 +34,14 @@ namespace ExportModule.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Endpoint")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("Fecha")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ConsultasAPI");
+                    b.ToTable("ConsultaAPIs");
                 });
 
             modelBuilder.Entity("ExportModule.Models.Cultivo", b =>
@@ -54,13 +54,11 @@ namespace ExportModule.Migrations
 
                     b.Property<string>("Nombre")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Tipo")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -85,22 +83,16 @@ namespace ExportModule.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("FechaExportacion")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Formato")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<int?>("PlagaId")
                         .HasColumnType("integer");
 
                     b.Property<string>("TipoDato")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -128,14 +120,10 @@ namespace ExportModule.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Nivel")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -154,18 +142,26 @@ namespace ExportModule.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Estado")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("FechaEjecucion")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Frecuencia")
+                        .HasColumnType("text");
+
                     b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
+
+                    b.Property<string>("Resultado")
+                        .HasColumnType("text");
 
                     b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UltimoIntento")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -175,19 +171,16 @@ namespace ExportModule.Migrations
             modelBuilder.Entity("ExportModule.Models.DatosAExportar", b =>
                 {
                     b.HasOne("ExportModule.Models.ConsultaAPI", "ConsultaAPI")
-                        .WithMany("DatosExportados")
-                        .HasForeignKey("ConsultaAPIId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .WithMany("DatosAExportar")
+                        .HasForeignKey("ConsultaAPIId");
 
                     b.HasOne("ExportModule.Models.Cultivo", "Cultivo")
-                        .WithMany()
-                        .HasForeignKey("CultivoId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .WithMany("DatosAExportar")
+                        .HasForeignKey("CultivoId");
 
                     b.HasOne("ExportModule.Models.Plaga", "Plaga")
-                        .WithMany()
-                        .HasForeignKey("PlagaId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .WithMany("DatosAExportar")
+                        .HasForeignKey("PlagaId");
 
                     b.Navigation("ConsultaAPI");
 
@@ -207,7 +200,7 @@ namespace ExportModule.Migrations
                     b.HasOne("ExportModule.Models.Cultivo", "Cultivo")
                         .WithMany("Plagas")
                         .HasForeignKey("CultivoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ConsultaAPI");
@@ -217,14 +210,21 @@ namespace ExportModule.Migrations
 
             modelBuilder.Entity("ExportModule.Models.ConsultaAPI", b =>
                 {
-                    b.Navigation("DatosExportados");
+                    b.Navigation("DatosAExportar");
 
                     b.Navigation("Plagas");
                 });
 
             modelBuilder.Entity("ExportModule.Models.Cultivo", b =>
                 {
+                    b.Navigation("DatosAExportar");
+
                     b.Navigation("Plagas");
+                });
+
+            modelBuilder.Entity("ExportModule.Models.Plaga", b =>
+                {
+                    b.Navigation("DatosAExportar");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,21 +1,16 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System;
 
 namespace ExportModule.Models
 {
     public class TareaProgramada
     {
-        [Key]
         public int Id { get; set; }
-
-        [Required]
-        [MaxLength(100)]
-        public string Nombre { get; set; } = string.Empty;
-
-        [Required]
+        public string? Nombre { get; set; }
         public DateTime FechaEjecucion { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        public string Tipo { get; set; } = string.Empty;
+        public string? Tipo { get; set; } // evaluacion, exportacion, notificacion
+        public string? Frecuencia { get; set; } // opcional
+        public string? Estado { get; set; } // pendiente, ejecutada, fallida
+        public DateTime? UltimoIntento { get; set; }
+        public string? Resultado { get; set; }
     }
 }

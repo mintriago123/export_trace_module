@@ -1,30 +1,19 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+ï»¿using System.Collections.Generic;
 
 namespace ExportModule.Models
 {
     public class Plaga
     {
-        [Key]
         public int Id { get; set; }
+        public string? Nombre { get; set; }
+        public string? Nivel { get; set; } // leve, moderado, crÃ­tico
 
-        [Required]
-        [MaxLength(100)]
-        public string Nombre { get; set; } = string.Empty;
-
-        [Required]
-        [MaxLength(20)]
-        public string Nivel { get; set; } = string.Empty;
-
-        // Claves foráneas
-        [ForeignKey("ConsultaAPI")]
-        public int ConsultaAPIId { get; set; }
-
-        [ForeignKey("Cultivo")]
         public int CultivoId { get; set; }
+        public Cultivo? Cultivo { get; set; }
 
-        // Navegación
-        public virtual ConsultaAPI ConsultaAPI { get; set; } = null!;
-        public virtual Cultivo Cultivo { get; set; } = null!;
+        public int ConsultaAPIId { get; set; }
+        public ConsultaAPI? ConsultaAPI { get; set; }
+
+        public ICollection<DatosAExportar> DatosAExportar { get; set; } = new List<DatosAExportar>();
     }
 }

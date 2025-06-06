@@ -13,17 +13,17 @@ namespace ExportModule.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ConsultasAPI",
+                name: "ConsultaAPIs",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Endpoint = table.Column<string>(type: "text", nullable: false),
-                    Fecha = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
+                    Endpoint = table.Column<string>(type: "text", nullable: true),
+                    Fecha = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ConsultasAPI", x => x.Id);
+                    table.PrimaryKey("PK_ConsultaAPIs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -32,8 +32,8 @@ namespace ExportModule.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Nombre = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Tipo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
+                    Nombre = table.Column<string>(type: "text", nullable: false),
+                    Tipo = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -46,9 +46,13 @@ namespace ExportModule.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Nombre = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Nombre = table.Column<string>(type: "text", nullable: true),
                     FechaEjecucion = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Tipo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
+                    Tipo = table.Column<string>(type: "text", nullable: true),
+                    Frecuencia = table.Column<string>(type: "text", nullable: true),
+                    Estado = table.Column<string>(type: "text", nullable: true),
+                    UltimoIntento = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Resultado = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -61,18 +65,18 @@ namespace ExportModule.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Nombre = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Nivel = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    ConsultaAPIId = table.Column<int>(type: "integer", nullable: false),
-                    CultivoId = table.Column<int>(type: "integer", nullable: false)
+                    Nombre = table.Column<string>(type: "text", nullable: true),
+                    Nivel = table.Column<string>(type: "text", nullable: true),
+                    CultivoId = table.Column<int>(type: "integer", nullable: false),
+                    ConsultaAPIId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Plagas", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Plagas_ConsultasAPI_ConsultaAPIId",
+                        name: "FK_Plagas_ConsultaAPIs_ConsultaAPIId",
                         column: x => x.ConsultaAPIId,
-                        principalTable: "ConsultasAPI",
+                        principalTable: "ConsultaAPIs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -80,7 +84,7 @@ namespace ExportModule.Migrations
                         column: x => x.CultivoId,
                         principalTable: "Cultivos",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -89,9 +93,9 @@ namespace ExportModule.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FechaExportacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
-                    TipoDato = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Formato = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    FechaExportacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TipoDato = table.Column<string>(type: "text", nullable: true),
+                    Formato = table.Column<string>(type: "text", nullable: true),
                     Contenido = table.Column<string>(type: "text", nullable: true),
                     CultivoId = table.Column<int>(type: "integer", nullable: true),
                     PlagaId = table.Column<int>(type: "integer", nullable: true),
@@ -101,23 +105,20 @@ namespace ExportModule.Migrations
                 {
                     table.PrimaryKey("PK_DatosAExportar", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DatosAExportar_ConsultasAPI_ConsultaAPIId",
+                        name: "FK_DatosAExportar_ConsultaAPIs_ConsultaAPIId",
                         column: x => x.ConsultaAPIId,
-                        principalTable: "ConsultasAPI",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalTable: "ConsultaAPIs",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_DatosAExportar_Cultivos_CultivoId",
                         column: x => x.CultivoId,
                         principalTable: "Cultivos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_DatosAExportar_Plagas_PlagaId",
                         column: x => x.PlagaId,
                         principalTable: "Plagas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -159,7 +160,7 @@ namespace ExportModule.Migrations
                 name: "Plagas");
 
             migrationBuilder.DropTable(
-                name: "ConsultasAPI");
+                name: "ConsultaAPIs");
 
             migrationBuilder.DropTable(
                 name: "Cultivos");
