@@ -5,11 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configuración de servicios
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddScoped<IConsultaApiService, ConsultaApiService>();
 builder.Services.AddScoped<IDatosAExportarService, DatosAExportarService>();
 builder.Services.AddScoped<ICultivoService, CultivoService>();
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -18,6 +19,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
+// Configuración del pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -27,3 +29,6 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+//  Esto se necesita para pruebas de integración
+public partial class Program { }

@@ -3,11 +3,8 @@
     "",
     "\\Controllers",
     "\\Data",
-    "\\DTOs",
     "\\Models",
-    "\\Services",
-    "\\Services\\Implementaciones",
-    "\\Services\\Interfaces"
+    "\\Test"
   ],
   "SelectedNode": "\\ExportModule.sln",
   "PreviewInSolutionExplorer": false
