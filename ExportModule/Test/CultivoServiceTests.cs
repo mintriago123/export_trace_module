@@ -4,13 +4,17 @@ using ExportModule.Services.Implementaciones;
 using ExportModule.Data.Context;
 using ExportModule.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Net;
+using ExportModule.Services.Interfaces;
 
+namespace ExportModule.Tests.Controllers;
 
-
-namespace ExportModule.Tests.Services;
 public class CultivoServiceTests
 {
     [Fact]
@@ -35,7 +39,9 @@ public class CultivoServiceTests
             .AddInMemoryCollection(configValues)
             .Build();
 
-        var service = new CultivoService(context, mockHttpClient, mockConfig);
+        var mockExportService = new Mock<IDatosAExportarService>();
+
+        var service = new CultivoService(context, mockHttpClient, mockConfig, mockExportService.Object);
 
         // Act
         var resultado = await service.EvaluarCultivoAsync(1);
@@ -50,7 +56,7 @@ public class CultivoServiceTests
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var json = "{\"aptoParaExportacion\": true, \"motivo\": \"Sin plagas\"}";
-            var response = new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json")
             };

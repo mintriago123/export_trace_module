@@ -13,12 +13,18 @@ namespace ExportModule.Services.Implementaciones
         private readonly AppDbContext _context;
         private readonly HttpClient _httpClient;
         private readonly string _iaUrl;
+        private readonly IDatosAExportarService _datosExportService;
 
-        public CultivoService(AppDbContext context, HttpClient httpClient, IConfiguration config)
+        public CultivoService(
+            AppDbContext context,
+            HttpClient httpClient,
+            IConfiguration config,
+            IDatosAExportarService datosExportService)
         {
             _context = context;
             _httpClient = httpClient;
-            _iaUrl = config["IA:EndpointEvaluacion"]; // ← desde appsettings.json o variable de entorno
+            _iaUrl = config["IA:EndpointEvaluacion"];
+            _datosExportService = datosExportService;
         }
 
         public async Task<(bool esExportable, string motivo)> EvaluarCultivoAsync(int cultivoId)
@@ -30,21 +36,15 @@ namespace ExportModule.Services.Implementaciones
             if (cultivo == null)
                 return (false, "Cultivo no encontrado");
 
-            // Armar el JSON
             var payload = new
             {
-                cultivo = new
-                {
-                    id = cultivo.Id,
-                    nombre = cultivo.Nombre,
-                    tipo = cultivo.Tipo
-                },
+                cultivo = new { id = cultivo.Id, nombre = cultivo.Nombre, tipo = cultivo.Tipo },
                 plagas = cultivo.Plagas.Select(p => new
                 {
                     id = p.Id,
                     nombre = p.Nombre,
                     nivel = p.Nivel.ToString().ToLower()
-                }).ToList()
+                })
             };
 
             var json = JsonSerializer.Serialize(payload);
@@ -59,11 +59,21 @@ namespace ExportModule.Services.Implementaciones
                 var result = JsonSerializer.Deserialize<EvaluacionResultado>(resultString,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
+                await _datosExportService.RegistrarExportacionAsync(
+                    cultivo.Id,
+                    "EvaluaciónIA",
+                    "json",
+                    JsonSerializer.Serialize(new
+                    {
+                        Apto = result.AptoParaExportacion,
+                        Motivo = result.Motivo
+                    })
+                );
+
                 return (result.AptoParaExportacion, result.Motivo);
             }
             catch (Exception ex)
             {
-                // Si falla la IA, podrías retornar falso o hacer fallback
                 return (false, $"Error en la evaluación externa: {ex.Message}");
             }
         }
