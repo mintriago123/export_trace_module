@@ -9,7 +9,7 @@ namespace ExportModule.Data.Context
             : base(options)
         {
         }
-
+        public DbSet<User> Users { get; set; }
         public DbSet<ConsultaAPI> ConsultaAPIs { get; set; }
         public DbSet<Cultivo> Cultivos { get; set; }
         public DbSet<Plaga> Plagas { get; set; }

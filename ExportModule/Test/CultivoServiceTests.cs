@@ -4,16 +4,10 @@ using ExportModule.Services.Implementaciones;
 using ExportModule.Data.Context;
 using ExportModule.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
 using System.Net;
 using ExportModule.Services.Interfaces;
 
-namespace ExportModule.Tests.Controllers;
+namespace ExportModule.Test;
 
 public class CultivoServiceTests
 {

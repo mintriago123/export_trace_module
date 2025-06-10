@@ -3,16 +3,10 @@ using System.Threading.Tasks;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
-namespace ExportModule.Tests.Controllers;
 
-public class CustomWebApplicationFactory : WebApplicationFactory<Program>
-{
-    protected override IHost CreateHost(IHostBuilder builder)
-    {
-        builder.UseContentRoot(@"C:\Users\Michael Intriago\Desktop\Nueva carpeta (2)\ExportModule\ExportModule");
-        return base.CreateHost(builder);
-    }
-}
+namespace ExportModule.Test;
+
+
 
 
 public class EvaluacionControllerTests : IClassFixture<WebApplicationFactory<Program>>
@@ -35,7 +29,7 @@ public class EvaluacionControllerTests : IClassFixture<WebApplicationFactory<Pro
     {
         // Arrange
         var cultivoId = 1; // Asegúrate de que este ID exista en la BD en memoria
-        var response = await _client.GetAsync($"/api/exportar/evaluar/{cultivoId}");
+        var response = await _client.GetAsync($" / api/exportar/evaluar/{cultivoId}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

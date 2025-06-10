@@ -165,6 +165,27 @@ namespace ExportModule.Migrations
                     b.ToTable("TareasProgramadas");
                 });
 
+            modelBuilder.Entity("ExportModule.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("ExportModule.Models.DatosAExportar", b =>
                 {
                     b.HasOne("ExportModule.Models.ConsultaAPI", "ConsultaAPI")
