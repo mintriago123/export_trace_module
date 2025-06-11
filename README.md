@@ -1,4 +1,3 @@
-
 # 🌾 ExportModule
 
 **ExportModule** es un módulo backend desarrollado en C# para gestionar la exportación de productos agrícolas. Evalúa la aptitud de exportación de cultivos en base a su información y presencia de plagas, integrando una IA externa para dicha evaluación.
@@ -12,17 +11,35 @@
 - Registro de resultados en la entidad **DatosAExportar**.
 - API REST documentada con **Swagger**.
 - Conexión a base de datos PostgreSQL usando **Entity Framework Core**.
+- Autenticación JWT para endpoints protegidos.
+- Pruebas unitarias y de integración.
 
 ---
 
-## 🛠️ Tecnologías
+## 🛠️ Tecnologías y dependencias
 
-- .NET 9
+- [.NET 9](https://dotnet.microsoft.com/download)
 - ASP.NET Core
-- Entity Framework Core (PostgreSQL)
-- Swagger / Swashbuckle
-- HttpClient
-- Moq y xUnit (para testing)
+- [Entity Framework Core](https://docs.microsoft.com/en-us/ef/core/) (`Microsoft.EntityFrameworkCore`, `Npgsql.EntityFrameworkCore.PostgreSQL`)
+- [Swagger / Swashbuckle.AspNetCore](https://github.com/domaindrivendev/Swashbuckle.AspNetCore)
+- [HttpClient](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient)
+- [AutoMapper](https://automapper.org/)
+- [JWT Bearer Authentication](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/jwt) (`Microsoft.AspNetCore.Authentication.JwtBearer`)
+- [xUnit](https://xunit.net/)
+- [Moq](https://github.com/moq/moq4)
+- [Microsoft.AspNetCore.Mvc.Testing](https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests)
+
+Instalación de paquetes principales vía NuGet:
+
+```bash
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+dotnet add package Swashbuckle.AspNetCore
+dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
+dotnet add package AutoMapper.Extensions.Microsoft.DependencyInjection
+dotnet add package xunit
+dotnet add package Moq
+dotnet add package Microsoft.AspNetCore.Mvc.Testing
+```
 
 ---
 
@@ -46,6 +63,11 @@
   },
   "IA": {
     "EndpointEvaluacion": "http://localhost:8000/evaluar-cultivo"
+  },
+  "Jwt": {
+    "Key": "clavepruebasupersegura1234567890123456",
+    "Issuer": "exportmodule-issuer",
+    "Audience": "exportmodule-audience"
   }
 }
 ```
@@ -75,7 +97,7 @@ Ejecutar tests:
 dotnet test
 ```
 
-Incluye pruebas unitarias para lógica de evaluación y persistencia de datos exportables.
+Incluye pruebas unitarias para lógica de evaluación y persistencia de datos exportables, así como pruebas de integración para endpoints protegidos por JWT.
 
 ---
 
@@ -86,23 +108,31 @@ ExportModule/
 │
 ├── Controllers/
 │   ├── ExportacionController.cs
-│   └── EvaluacionController.cs
+│   ├── EvaluacionController.cs
+│   └── AuthController.cs
 │
 ├── Services/
 │   └── Implementaciones/
 │       ├── CultivoService.cs
 │       ├── DatosAExportarService.cs
-│       └── AgenteEvaluadorService.cs
+│       ├── AgenteEvaluadorService.cs
+│       └── ConsultaApiService.cs
 │
 ├── Data/
 │   └── Context/
 │       └── AppDbContext.cs
 │
 ├── Models/
-│   └── Cultivo.cs, Plaga.cs, DatosAExportar.cs
+│   ├── Cultivo.cs
+│   ├── Plaga.cs
+│   ├── DatosAExportar.cs
+│   └── User.cs
 │
 ├── appsettings.json
-└── Program.cs
+├── Program.cs
+└── ExportModule.Test/
+    ├── ConsultaApiIntegrationTests.cs
+    └── JwtTokenHelper.cs
 ```
 
 ---
@@ -132,15 +162,49 @@ Lista todos los datos exportados.
 #### `GET /api/exportacion/{id}`
 Obtiene una exportación específica.
 
-
 ##### Cuerpo JSON de ejemplo:
 ```json
 {
   "cultivoId": 1,
   "tipoDato": "EvaluaciónIA",
   "formato": "json",
-  "contenido": "{ "Apto": true, "Motivo": "Sin plagas" }"
+  "contenido": "{ \"Apto\": true, \"Motivo\": \"Sin plagas\" }"
 }
 ```
 
+---
 
+### 📍 Autenticación
+
+#### `POST /api/auth/login`
+Obtén un token JWT enviando usuario y contraseña.
+
+##### Cuerpo de solicitud:
+```json
+{
+  "Username": "admin",
+  "Password": "1234"
+}
+```
+
+##### Ejemplo de respuesta:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+}
+```
+
+Utiliza el token en el header:
+```
+Authorization: Bearer {token}
+```
+
+---
+
+## 📝 Notas
+
+- Cambia el valor de la clave JWT y credenciales en producción.
+- Siempre ejecuta las migraciones luego de actualizar el modelo de datos.
+- Los endpoints de evaluación y exportación requieren autenticación vía JWT.
+
+---

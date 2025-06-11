@@ -10,7 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configuración JWT
 var jwtConfig = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(jwtConfig["Key"]);
+var keyValue = jwtConfig["Key"];
+if (string.IsNullOrEmpty(keyValue))
+    throw new InvalidOperationException("JWT Key is not configured. Please check your configuration files.");
+
+var key = Encoding.UTF8.GetBytes(keyValue);
+
+
+//var key = Encoding.UTF8.GetBytes(jwtConfig["Key"]);
 
 builder.Services.AddAuthentication(options =>
 {
