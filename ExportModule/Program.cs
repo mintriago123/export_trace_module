@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configuración JWT
 var jwtConfig = builder.Configuration.GetSection("Jwt");
-var key = Encoding.ASCII.GetBytes(jwtConfig["Key"]);
+var key = Encoding.UTF8.GetBytes(jwtConfig["Key"]);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -23,12 +23,10 @@ builder.Services.AddAuthentication(options =>
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtConfig["Issuer"],
-        ValidAudience = jwtConfig["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
 
@@ -39,6 +37,7 @@ builder.Services.AddAuthorization();
 // Configuración de servicios
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
+
 builder.Services.AddScoped<IConsultaApiService, ConsultaApiService>();
 builder.Services.AddScoped<IDatosAExportarService, DatosAExportarService>();
 builder.Services.AddScoped<ICultivoService, CultivoService>();

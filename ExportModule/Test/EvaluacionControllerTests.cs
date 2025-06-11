@@ -3,35 +3,38 @@ using System.Threading.Tasks;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
+using Microsoft.Extensions.Configuration;
 
-namespace ExportModule.Test;
-
-
-
-
-public class EvaluacionControllerTests : IClassFixture<WebApplicationFactory<Program>>
+namespace ExportModule.Test
 {
-    private readonly HttpClient _client;
-
-    public EvaluacionControllerTests(WebApplicationFactory<Program> factory)
+    public class EvaluacionControllerTests : IClassFixture<WebApplicationFactory<Program>>
     {
-        _client = factory.WithWebHostBuilder(builder =>
+        private readonly HttpClient _client;
+
+        public EvaluacionControllerTests(WebApplicationFactory<Program> factory)
         {
-            builder.ConfigureServices(services =>
+            _client = factory.WithWebHostBuilder(builder =>
             {
-                // Puedes inyectar servicios de prueba aquí si necesitas reemplazar algo
-            });
-        }).CreateClient();
-    }
+                builder.ConfigureAppConfiguration((context, config) =>
+                {
+                    config.AddJsonFile("appsettings.Test.json");
+                });
+                builder.ConfigureServices(services =>
+                {
+                    // Puedes inyectar servicios de prueba aquí si necesitas reemplazar algo
+                });
+            }).CreateClient();
+        }
 
-    [Fact]
-    public async Task GetEvaluacion_ReturnsSuccess()
-    {
-        // Arrange
-        var cultivoId = 1; // Asegúrate de que este ID exista en la BD en memoria
-        var response = await _client.GetAsync($" / api/exportar/evaluar/{cultivoId}");
+        [Fact]
+        public async Task GetEvaluacion_ReturnsSuccess()
+        {
+            // Arrange
+            var cultivoId = 1; // Asegúrate de que este ID exista en la BD en memoria
+            var response = await _client.GetAsync($"/api/exportar/evaluar/{cultivoId}");
 
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
     }
 }
