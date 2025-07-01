@@ -35,6 +35,25 @@ namespace ExportModule.Controllers
             return Ok(new { token });
         }
 
+        [HttpPost("register")]
+        public IActionResult Register([FromBody] User newUser)
+        {
+            // Validar si el usuario ya existe
+            var existingUser = _context.Users.FirstOrDefault(u => u.Username == newUser.Username);
+            if (existingUser != null)
+            {
+                return BadRequest(new { message = "El usuario ya existe" });
+            }
+
+            // Aquí puedes agregar lógica para encriptar la contraseña si quieres
+
+            // Agregar usuario a la base de datos
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(Register), new { id = newUser.Id }, newUser);
+        }
+
         private string GenerateJwtToken(User user)
         {
             var jwtConfig = _config.GetSection("Jwt");
