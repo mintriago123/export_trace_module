@@ -16,9 +16,6 @@ if (string.IsNullOrEmpty(keyValue))
 
 var key = Encoding.UTF8.GetBytes(keyValue);
 
-
-//var key = Encoding.UTF8.GetBytes(jwtConfig["Key"]);
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -78,12 +75,33 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Debug: Verificar la cadena de conexión
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine($"Connection String: {connectionString}");
+
+// Configuración de SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(connectionString));
 
 builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
+
+// Asegurar que la base de datos existe
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        context.Database.EnsureCreated();
+        Console.WriteLine("Database created successfully");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error creating database: {ex.Message}");
+        throw;
+    }
+}
 
 // Configuración del pipeline HTTP
 if (app.Environment.IsDevelopment())
@@ -94,7 +112,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.MapControllers();
 
