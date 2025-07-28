@@ -1,10 +1,5 @@
 using ExportModule.Data.Context;
-usinbuilder.Services.AddAuthorization();
-
-// Configuración de servicios
-builder.Services.AddHttpClient();
-builder.Services.AddHttpContextAccessor(); // Para acceder al contexto HTTP
-builder.Services.AddControllers();ortModule.Services.Implementaciones;
+using ExportModule.Services.Implementaciones;
 using ExportModule.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +8,13 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuraci�n JWT
+// Configuración de servicios
+builder.Services.AddAuthorization();
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor(); // Para acceder al contexto HTTP
+builder.Services.AddControllers();
+
+// Configuración JWT
 var jwtConfig = builder.Configuration.GetSection("Jwt");
 var keyValue = jwtConfig["Key"];
 if (string.IsNullOrEmpty(keyValue))
@@ -28,7 +29,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // Cambiar a true en producci�n
+    options.RequireHttpsMetadata = false; // Cambiar a true en producción
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -41,11 +42,7 @@ builder.Services.AddAuthentication(options =>
 
 });
 
-builder.Services.AddAuthorization();
 
-// Configuraci�n de servicios
-builder.Services.AddHttpClient();
-builder.Services.AddControllers();
 
 builder.Services.AddScoped<IConsultaApiService, ConsultaApiService>();
 builder.Services.AddScoped<IDatosAExportarService, DatosAExportarService>();
@@ -80,11 +77,11 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Debug: Verificar la cadena de conexi�n
+// Debug: Verificar la cadena de conexión
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 Console.WriteLine($"Connection String: {connectionString}");
 
-// Configuraci�n de SQLite
+// Configuración de SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString));
 
@@ -108,7 +105,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configuraci�n del pipeline HTTP
+// Configuración del pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -122,5 +119,5 @@ app.MapControllers();
 
 app.Run();
 
-// Necesario para pruebas de integraci�n
+// Necesario para pruebas de integración
 public partial class Program { }
