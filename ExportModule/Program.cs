@@ -1,5 +1,10 @@
 using ExportModule.Data.Context;
-using ExportModule.Services.Implementaciones;
+usinbuilder.Services.AddAuthorization();
+
+// ConfiguraciÃ³n de servicios
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor(); // Para acceder al contexto HTTP
+builder.Services.AddControllers();ortModule.Services.Implementaciones;
 using ExportModule.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +13,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuración JWT
+// Configuraciï¿½n JWT
 var jwtConfig = builder.Configuration.GetSection("Jwt");
 var keyValue = jwtConfig["Key"];
 if (string.IsNullOrEmpty(keyValue))
@@ -23,7 +28,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // Cambiar a true en producción
+    options.RequireHttpsMetadata = false; // Cambiar a true en producciï¿½n
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -38,7 +43,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// Configuración de servicios
+// Configuraciï¿½n de servicios
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 
@@ -75,11 +80,11 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Debug: Verificar la cadena de conexión
+// Debug: Verificar la cadena de conexiï¿½n
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 Console.WriteLine($"Connection String: {connectionString}");
 
-// Configuración de SQLite
+// Configuraciï¿½n de SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString));
 
@@ -103,7 +108,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configuración del pipeline HTTP
+// Configuraciï¿½n del pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -117,5 +122,5 @@ app.MapControllers();
 
 app.Run();
 
-// Necesario para pruebas de integración
+// Necesario para pruebas de integraciï¿½n
 public partial class Program { }
